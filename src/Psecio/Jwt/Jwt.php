@@ -4,10 +4,25 @@ namespace Psecio\Jwt;
 
 class Jwt
 {
+	/**
+	 * Set of claims for the current JWT object
+	 * @var \Psecio\Jwt\ClaimsCollection
+	 */
 	private $claims;
-	private $header;
-	private $hashMethod = 'hmac';
 
+	/**
+	 * Current header for JWT object
+	 * @var \Psecio\Jwt\Header
+	 */
+	private $header;
+
+	/**
+	 * Initialize the object and set the header and claims collection
+	 * 	Empty claims collection is set if none is given
+	 *
+	 * @param \Psecio\Jwt\Header $header Header instance to set on JWT object
+	 * @param \Psecio\Jwt\ClaimsCollection $collection Claims collection [optional]
+	 */
 	public function __construct(\Psecio\Jwt\Header $header, \Psecio\Jwt\ClaimsCollection $collection = null)
 	{
 		$this->setHeader($header);
@@ -17,31 +32,68 @@ class Jwt
 		$this->setClaims($collection);
 	}
 
+	/**
+	 * Set the header instance
+	 *
+	 * @param PsecioJwtHeader $header [description]
+	 * @return \Psecio\Jwt\Jwt Current Jwt instance
+	 */
 	public function setHeader(\Psecio\Jwt\Header $header)
 	{
 		$this->header = $header;
 		return $this;
 	}
+
+	/**
+	 * Get the currently assigned header instance
+	 *
+	 * @return \Psecio\Jwt\Header Header object instance
+	 */
 	public function getHeader()
 	{
 		return $this->header;
 	}
 
+	/**
+	 * Add a Claim to the current collection
+	 *
+	 * @param \Psecio\Jwt\Claims $claim Claim instance to add
+	 * @return \Psecio\Jwt\Jwt Current Jwt instance
+	 */
 	public function addClaim(\Psecio\Jwt\Claims $claim)
 	{
 		$this->claims->add($claim);
 		return $this;
 	}
+
+	/**
+	 * Get the current claims collection
+	 *
+	 * @return \Psecio\Jwt\ClaimsCollection instance
+	 */
 	public function getClaims()
 	{
 		return $this->claims;
 	}
+
+	/**
+	 * Set the claims collection
+	 *
+	 * @param \Psecio\Jwt\ClaimsCollection $collection Claims collection instance
+	 * @return \Psecio\Jwt\Jwt Current Jwt instance
+	 */
 	public function setClaims(\Psecio\Jwt\ClaimsCollection $collection)
 	{
 		$this->claims = $collection;
 		return $this;
 	}
 
+	/**
+	 * Encode the current object with the given key
+	 *
+	 * @param string $key Key for encoding
+	 * @return string Encoded data, appended by periods
+	 */
 	public function encode($key)
 	{
 		$header = $this->getHeader();
@@ -64,6 +116,17 @@ class Jwt
 		return implode('.', $sections);
 	}
 
+	/**
+	 * Decode the data with the given key
+	 * 	Optional "verify" parameter validates the signature as well (default is on)
+	 *
+	 * @param string $data Data to decode (entire JWT data string)
+	 * @param string $key Key used for encoding process
+	 * @param boolean $verify Verify the signature on the data [optional]
+	 * @throws \InvalidArgumentException If invalid number of sections
+	 * @throws \DomainException If signature doesn't verify
+	 * @return \stdClass Decoded claims data
+	 */
 	public function decode($data, $key, $verify = true)
 	{
 		$sections = explode('.', $data);
@@ -72,10 +135,9 @@ class Jwt
 		}
 
 		list($header, $claims, $signature) = $sections;
-
 		$header = json_decode($this->base64Decode($header));
-		$signature = $this->base64Decode($signature);
 		$claims = json_decode($this->base64Decode($claims));
+		$signature = $this->base64Decode($signature);
 
 		if ($verify === true) {
 			if ($this->verify($key, $header, $claims, $signature) === false){
@@ -86,6 +148,17 @@ class Jwt
 		return $claims;
 	}
 
+	/**
+	 * Verify the signature on the JWT message
+	 *
+	 * @param string $key Key used for hashing
+	 * @param \stdClass $header Header data (object)
+	 * @param \stdClass $claims Set of claims
+	 * @param string $signature Signature string
+	 * @throws \InvalidArgumentException If no algorithm is specified
+	 * @throws \InvalidArgumentException If the message has expired
+	 * @return boolean Pass/fail of verification
+	 */
 	public function verify($key, $header, $claims, $signature)
 	{
 		if (empty($header->alg)) {
@@ -103,11 +176,25 @@ class Jwt
 		return ($this->sign($signWith, $key, $algorithm) === $signature);
 	}
 
+	/**
+	 * Base64 encode data and prepare for the URL
+	 * 	NOTE: The "=" is removed as it's just padding in base64
+	 *  and not needed.
+	 *
+	 * @param string $data Data string
+	 * @return string Formatted data
+	 */
 	public function base64Encode($data)
 	{
 		return urlencode(str_replace('=', '', base64_encode($data)));
 	}
 
+	/**
+	 * Base64 decode (and url decode) the given data
+	 *
+	 * @param string $data Data to decode
+	 * @return string Decoded data
+	 */
 	public function base64Decode($data)
 	{
 		$decoded = urldecode($data);
@@ -121,6 +208,14 @@ class Jwt
 		return base64_decode($decoded);
 	}
 
+	/**
+	 * Generate the signature with the given data, key and algorithm
+	 *
+	 * @param string $signWith Data to sign hash with
+	 * @param string $key Key for signing
+	 * @param string $algorithm Algorithm type
+	 * @return string Generated signature hash
+	 */
 	public function sign($signWith, $key, $algorithm)
 	{
 		$signature = hash_hmac(
@@ -133,16 +228,15 @@ class Jwt
 		return $signature;
 	}
 
-	public function findAlgorithm($algorithm)
-	{
-		foreach ($this->hashTypes as $type => $hashAlgorithm) {
-			if ($type == $algorithm) {
-				return $hashAlgorithm;
-			}
-		}
-		return false;
-	}
-
+	/**
+	 * Magic method for setting claims by name
+	 * 	Ex. "issuedAt()" calls Claims\IssuedAt
+	 *
+	 * @param string $name Function name
+	 * @param array $args Arguments to pass
+	 * @throws \InvalidArgumentException If invalid claim type
+	 * @return \Psecio\Jwt\Jwt instance
+	 */
 	public function __call($name, $args)
 	{
 		// see if it matches one of our claim types
