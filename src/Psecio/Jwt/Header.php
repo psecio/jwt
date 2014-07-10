@@ -5,8 +5,14 @@ namespace Psecio\Jwt;
 class Header
 {
 	private $type = 'JWT';
-	private $algorithm = 'none';
+	private $algorithm = 'HS256';
 	private $key;
+	private $hashTypes = array(
+		'HS256' => 'SHA256',
+		'HS384' => 'SHA384',
+		'HS512' => 'SHA512',
+	);
+	private $hashMethod = 'hmac';
 
 	public function __construct($type = 'JWT', $algorithm = 'HS256', $key = null)
 	{
@@ -29,9 +35,17 @@ class Header
 	{
 		$this->algorithm = $algorithm;
 	}
-	public function getAlgorithm()
+	public function getAlgorithm($resolve = false)
 	{
-		return $this->algorithm;
+		$algorithm = $this->algorithm;
+		if ($resolve === true) {
+			foreach ($this->hashTypes as $key => $algo) {
+				if ($key === $algorithm) {
+					return $this->hashTypes[$key];
+				}
+			}
+		}
+		return $algorithm;
 	}
 	public function setKey($key)
 	{

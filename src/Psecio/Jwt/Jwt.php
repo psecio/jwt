@@ -7,11 +7,6 @@ class Jwt
 	private $claims;
 	private $header;
 	private $hashMethod = 'hmac';
-	private $hashTypes = array(
-		'HS256' => 'SHA256',
-		'HS384' => 'SHA384',
-		'HS512' => 'SHA512',
-	);
 
 	public function __construct(\Psecio\Jwt\Header $header, \Psecio\Jwt\ClaimsCollection $collection = null)
 	{
@@ -82,14 +77,13 @@ class Jwt
 		$signature = $this->base64Decode($signature);
 		$claims = json_decode($this->base64Decode($claims));
 
-		var_export($header);
-		var_export($signature);
-		var_export($claims);
-
 		if ($verify === true) {
-			$result = $this->verify($key, $header, $claims, $signature);
-			echo 'VERIFY: '.var_export($result, true)."\n";
+			if ($this->verify($key, $header, $claims, $signature) === false){
+				throw new \DomainException('Signature did not verify');
+			}
 		}
+
+		return $claims;
 	}
 
 	public function verify($key, $header, $claims, $signature)
@@ -130,7 +124,7 @@ class Jwt
 	public function sign($signWith, $key, $algorithm)
 	{
 		$signature = hash_hmac(
-			$this->findAlgorithm($algorithm),
+			$this->getHeader()->getAlgorithm(true),
 			$signWith,
 			$key,
 			true
