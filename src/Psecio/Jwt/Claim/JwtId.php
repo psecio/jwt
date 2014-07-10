@@ -1,8 +1,8 @@
 <?php
 
-namespace Psecio\Jwt\Claims;
+namespace Psecio\Jwt\Claim;
 
-class JwtId extends \Psecio\Jwt\Claims
+class JwtId extends \Psecio\Jwt\Claim
 {
 	protected $type = 'jti';
 }

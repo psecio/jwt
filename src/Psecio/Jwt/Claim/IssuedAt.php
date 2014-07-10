@@ -1,8 +1,8 @@
 <?php
 
-namespace Psecio\Jwt\Claims;
+namespace Psecio\Jwt\Claim;
 
-class IssuedAt extends \Psecio\Jwt\Claims
+class IssuedAt extends \Psecio\Jwt\Claim
 {
 	protected $type = 'iat';
 }

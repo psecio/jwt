@@ -1,8 +1,8 @@
 <?php
 
-namespace Psecio\Jwt\Claims;
+namespace Psecio\Jwt\Claim;
 
-class Audience extends \Psecio\Jwt\Claims
+class Audience extends \Psecio\Jwt\Claim
 {
 	protected $type = 'aud';
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Psecio\Jwt\Claims;
+namespace Psecio\Jwt\Claim;
 
-class Subject extends \Psecio\Jwt\Claims
+class Subject extends \Psecio\Jwt\Claim
 {
 	protected $type = 'sub';
 }

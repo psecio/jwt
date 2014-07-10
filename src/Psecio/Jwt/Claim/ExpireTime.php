@@ -1,8 +1,8 @@
 <?php
 
-namespace Psecio\Jwt\Claims;
+namespace Psecio\Jwt\Claim;
 
-class ExpireTime extends \Psecio\Jwt\Claims
+class ExpireTime extends \Psecio\Jwt\Claim
 {
 	protected $type = 'exp';
 }
