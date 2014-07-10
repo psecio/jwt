@@ -34,6 +34,13 @@ abstract class Claim
 	 */
 	public function setValue($value)
 	{
+		if (method_exists($this, 'validate')) {
+			if ($this->validate($value) == false) {
+				throw new \DomainException(
+					'Invalid data provided for claim "'.$this->getType().'": '.$value
+				);
+			}
+		}
 		$this->value = $value;
 		return $this;
 	}
