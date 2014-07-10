@@ -1,8 +1,8 @@
 {
     "name":"psecio/jwt",
     "type":"library",
-    "description":"A JWT Encoding & Decoding library",
-    "keywords":["jwt", "web", "token"],
+    "description":"A JWT (JSON Web Token) Encoding & Decoding library",
+    "keywords":["jwt", "json", "web", "token"],
     "homepage":"https://github.com/psecio/jwt.git",
     "license":"MIT",
     "authors":[

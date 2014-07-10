@@ -1,7 +1,7 @@
-JWT Creation and Decoding Library
+JWT (JSON Web Token) Creation and Decoding Library
 ====================
 
-This library allows for the creation and decoding of JWT (Java Web Tokens).
+This library allows for the creation and decoding of JWT (JSON Web Tokens).
 
 ### Example Usage
 
