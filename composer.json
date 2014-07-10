@@ -1,0 +1,23 @@
+{
+    "name":"psecio/jwt",
+    "type":"library",
+    "description":"A JWT Encoding & Decoding library",
+    "keywords":["jwt", "web", "token"],
+    "homepage":"https://github.com/psecio/jwt.git",
+    "license":"MIT",
+    "authors":[
+        {
+            "name":"Chris Cornutt",
+            "email":"ccornutt@phpdeveloper.org",
+            "homepage":"http://www.phpdeveloper.org/"
+        }
+    ],
+    "require":{
+        "php":">=5.3.1"
+    },
+    "autoload": {
+        "psr-0": {
+            "Psecio": "src/"
+        }
+    }
+}
