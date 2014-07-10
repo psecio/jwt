@@ -16,7 +16,7 @@ class ClaimsCollection
 	 * @param \Psecio\Jwt\Claims $claim Claim instance
 	 * @return \Psecio\Jwt\ClaimsCollection instance
 	 */
-	public function add(\Psecio\Jwt\Claims $claim)
+	public function add(\Psecio\Jwt\Claim $claim)
 	{
 		$this->claims[] = $claim;
 		return $this;

@@ -57,10 +57,10 @@ class Jwt
 	/**
 	 * Add a Claim to the current collection
 	 *
-	 * @param \Psecio\Jwt\Claims $claim Claim instance to add
+	 * @param \Psecio\Jwt\Claim $claim Claim instance to add
 	 * @return \Psecio\Jwt\Jwt Current Jwt instance
 	 */
-	public function addClaim(\Psecio\Jwt\Claims $claim)
+	public function addClaim(\Psecio\Jwt\Claim $claim)
 	{
 		$this->claims->add($claim);
 		return $this;
@@ -240,7 +240,7 @@ class Jwt
 	public function __call($name, $args)
 	{
 		// see if it matches one of our claim types
-		$className = "\\Psecio\\Jwt\\Claims\\".ucwords($name);
+		$className = "\\Psecio\\Jwt\\Claim\\".ucwords($name);
 		if (class_exists($className)) {
 			$claim = new $className($args[0]);
 			$this->addClaim($claim);

@@ -2,7 +2,7 @@
 
 namespace Psecio\Jwt;
 
-abstract class Claims
+abstract class Claim
 {
 	/**
 	 * Claim type
