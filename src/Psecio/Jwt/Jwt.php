@@ -16,6 +16,9 @@ class Jwt
 	 */
 	private $header;
 
+	private $encryptAlgorithm;
+	private $encryptIv;
+
 	/**
 	 * Initialize the object and set the header and claims collection
 	 * 	Empty claims collection is set if none is given
@@ -88,13 +91,36 @@ class Jwt
 		return $this;
 	}
 
+	public function getEncryptAlgorithm()
+	{
+		return $this->encryptAlgorithm;
+	}
+
+	public function getEncryptIv()
+	{
+		return $this->encryptIv;
+	}
+
+	public function setEncryptionAlgorithm($algorithm)
+	{
+		$this->encryptAlgorithm = $algorithm;
+		return $this;
+	}
+
+	public function setEncryptionIv($iv)
+	{
+		$this->encryptIv = $iv;
+		return $this;
+	}
+
 	/**
 	 * Encode the current object with the given key
 	 *
 	 * @param string $key Key for encoding
+	 * @param boolean $encrypt Encrypt the result [optional]
 	 * @return string Encoded data, appended by periods
 	 */
-	public function encode($key)
+	public function encode($key, $encrypt = false)
 	{
 		$header = $this->getHeader();
 		$sections = array(
@@ -113,7 +139,13 @@ class Jwt
 			$sections[] = $this->base64Encode($signature);
 		}
 
-		return implode('.', $sections);
+		$result = implode('.', $sections);
+
+		if ($encrypt === true) {
+			$result = $this->encrypt($result, $key);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -123,12 +155,17 @@ class Jwt
 	 * @param string $data Data to decode (entire JWT data string)
 	 * @param string $key Key used for encoding process
 	 * @param boolean $verify Verify the signature on the data [optional]
+	 * @param boolean $decrypt Decrypt the incoming data
 	 * @throws \InvalidArgumentException If invalid number of sections
 	 * @throws \DomainException If signature doesn't verify
 	 * @return \stdClass Decoded claims data
 	 */
-	public function decode($data, $key, $verify = true)
+	public function decode($data, $key, $verify = true, $decrypt = false)
 	{
+		if ($decrypt == true) {
+			$data = $this->decrypt($data, $key);
+		}
+
 		$sections = explode('.', $data);
 		if (count($sections) < 3) {
 			throw new \InvalidArgumentException('Invalid number of sections (<3)');
@@ -146,6 +183,58 @@ class Jwt
 		}
 
 		return $claims;
+	}
+
+	/**
+	 * Encrypt the data with the given key (and algorithm/IV)
+	 *
+	 * @param string $data Data to encrypt
+	 * @param string $key Key to use for encryption
+	 * @throws \DomainException If OpenSSL is not enabled
+	 * @throws \InvalidArgumentException If required information not provided
+	 * @return string Encrypted string
+	 */
+	public function encrypt($data, $key)
+	{
+		if (!function_exists('openssl_encrypt')) {
+			throw new \DomainException('Cannot encrypt data, OpenSSL not enabled');
+		}
+		$encryptAlgorithm = $this->getEncryptAlgorithm();
+		$encryptIv = $this->getEncryptIv();
+
+		if ($encryptAlgorithm == null || $encryptIv == null) {
+			throw new \InvalidArgumentException('Required encryption information not provided');
+		}
+
+		return openssl_encrypt(
+			$data, $encryptAlgorithm, $key, false, $encryptIv
+		);
+	}
+
+	/**
+	 * Decrypt given data wtih given key (and algorithm/IV)
+	 *
+	 * @param string $data Data to decrypt
+	 * @param string $key Key to use for decryption
+	 * @throws \DomainException If OpenSSL is not installed
+	 * @throws \InvalidArgumentException If required information not provided
+	 * @return string Decrypted data
+	 */
+	public function decrypt($data, $key)
+	{
+		if (!function_exists('openssl_encrypt')) {
+			throw new \DomainException('Cannot encrypt data, OpenSSL not enabled');
+		}
+		$encryptAlgorithm = $this->getEncryptAlgorithm();
+		$encryptIv = $this->getEncryptIv();
+
+		if ($encryptAlgorithm == null || $encryptIv == null) {
+			throw new \InvalidArgumentException('Required encryption information not provided');
+		}
+
+		return openssl_decrypt(
+			$data, $encryptAlgorithm, $key, false, $encryptIv
+		);
 	}
 
 	/**
