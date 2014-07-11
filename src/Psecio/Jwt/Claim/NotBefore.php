@@ -2,6 +2,11 @@
 
 namespace Psecio\Jwt\Claim;
 
+/**
+ * Claim type Not Before (nbf)
+ *
+ * @package Jwt
+ */
 class NotBefore extends \Psecio\Jwt\Claim
 {
 	protected $type = 'nbf';

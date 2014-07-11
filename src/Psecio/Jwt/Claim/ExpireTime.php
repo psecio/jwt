@@ -2,6 +2,11 @@
 
 namespace Psecio\Jwt\Claim;
 
+/**
+ * Claim type Expire Time (exp)
+ *
+ * @package Jwt
+ */
 class ExpireTime extends \Psecio\Jwt\Claim
 {
 	protected $type = 'exp';

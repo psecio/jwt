@@ -2,6 +2,11 @@
 
 namespace Psecio\Jwt\Claim;
 
+/**
+ * Claim type Issued At (iat)
+ *
+ * @package Jwt
+ */
 class IssuedAt extends \Psecio\Jwt\Claim
 {
 	protected $type = 'iat';
