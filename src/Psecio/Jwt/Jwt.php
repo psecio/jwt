@@ -139,6 +139,13 @@ class Jwt
 		$claims = json_decode($this->base64Decode($claims));
 		$signature = $this->base64Decode($signature);
 
+		// If a "not before" is provided, validate the time
+		if (isset($claims->nbf) && $claims->nbf > time()) {
+			throw new \DomainException(
+				'Cannot process prior to '.date('m.d.Y H:i:s', $claims->nbf).' [nbf]'
+			);
+		}
+
 		if ($verify === true) {
 			if ($this->verify($key, $header, $claims, $signature) === false){
 				throw new \DomainException('Signature did not verify');
