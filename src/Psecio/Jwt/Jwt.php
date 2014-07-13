@@ -289,7 +289,7 @@ class Jwt
 	 */
 	public function base64Encode($data)
 	{
-		return urlencode(str_replace('=', '', base64_encode($data)));
+		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 	}
 
 	/**
