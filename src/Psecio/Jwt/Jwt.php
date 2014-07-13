@@ -156,13 +156,12 @@ class Jwt
 	 * 	Optional "verify" parameter validates the signature as well (default is on)
 	 *
 	 * @param string $data Data to decode (entire JWT data string)
-	 * @param string $key Key used for encoding process
 	 * @param boolean $verify Verify the signature on the data [optional]
 	 * @throws \InvalidArgumentException If invalid number of sections
 	 * @throws \DomainException If signature doesn't verify
 	 * @return \stdClass Decoded claims data
 	 */
-	public function decode($data, $key, $verify = true)
+	public function decode($data, $verify = true)
 	{
 		$sections = explode('.', $data);
 		if (count($sections) < 3) {
@@ -173,6 +172,7 @@ class Jwt
 		$header = json_decode($this->base64Decode($header));
 		$claims = json_decode($this->base64Decode($claims));
 		$signature = $this->base64Decode($signature);
+		$key = $this->getHeader()->getKey();
 
 		if ($verify === true) {
 			if ($this->verify($key, $header, $claims, $signature) === false){
