@@ -1,6 +1,8 @@
 JWT (JSON Web Token) Creation and Decoding Library
 ====================
 
+[![Build Status](https://travis-ci.org/psecio/jwt.svg?branch=master)](http://travis-ci.org/psecio/jwt)
+
 This library allows for the creation and decoding of JWT (JSON Web Tokens).
 
 ### Example Usage
