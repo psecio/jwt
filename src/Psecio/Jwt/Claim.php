@@ -20,10 +20,14 @@ abstract class Claim
 	 * Initialize the claim with the given value
 	 *
 	 * @param string $value Claim value
+	 * @param string $type Type value [optional]
 	 */
-	public function __construct($value)
+	public function __construct($value, $type = null)
 	{
 		$this->setValue($value);
+		if ($type !== null) {
+			$this->setType($type);
+		}
 	}
 
 	/**
