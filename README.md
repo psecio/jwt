@@ -20,20 +20,21 @@ require_once 'vendor/autoload.php';
 
 $key = "example_key";
 
-$header = new \Psecio\Jwt\Header();
-$header->setKey($key);
-
+$header = new \Psecio\Jwt\Header($key);
 $jwt = new \Psecio\Jwt\Jwt($header);
 
 $jwt
     ->issuer('http://example.org')
     ->audience('http://example.com')
 	->issuedAt(1356999524)
-	->notBefore(1357000000);
+	->notBefore(1357000000)
+	->expireTime(time()+3600)
+	->jwtId('id123456')
+	->type('https://example.com/register');
 
-$result = $jwt->encode($key);
+$result = $jwt->encode();
 echo 'ENCODED: '.print_r($result)."\n\n";
-echo 'DECODED: '.var_export($jwt->decode($result, $key), true);
+echo 'DECODED: '.var_export($jwt->decode($result), true);
 
 ?>
 ```
@@ -49,10 +50,7 @@ require_once 'vendor/autoload.php';
 
 $key = "example_key";
 
-$header = new \Psecio\Jwt\Header();
-$header->setKey($key)
-	->setEncryption('AES-256-CBC');
-
+$header = new \Psecio\Jwt\Header($key);
 $jwt = new \Psecio\Jwt\Jwt($header);
 
 $jwt
@@ -60,9 +58,15 @@ $jwt
     ->audience('http://example.com')
 	->issuedAt(1356999524)
 	->notBefore(1357000000)
-	->setIv('1234567812345678');
+	->expireTime(time()+3600)
+	->jwtId('id123456')
+	->type('https://example.com/register');
 
-$result = $jwt->encode($key);
+$result = $jwt->encrypt('AES-256-CBC', '1234567812345678');
+
+echo 'ENCRYPTED: '.var_export($result, true)."\n";
+echo "DECRYPTED: ".var_export($jwt->decrypt($result, 'AES-256-CBC', '1234567812345678'), true)."\n";
+
 ?>
 ```
 
