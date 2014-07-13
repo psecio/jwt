@@ -9,7 +9,7 @@
          verbose="true"
          colors="true">
     <testsuites>
-        <testsuite name="csrf">
+        <testsuite name="jwt">
             <directory>./tests</directory>
         </testsuite>
     </testsuites>
