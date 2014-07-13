@@ -41,17 +41,15 @@ class Header
 	/**
 	 * Intitialize the Header
 	 *
-	 * @param string $type Type of object
-	 * @param string $algorithm Algorithm to use
 	 * @param string $key Key to use for encoding
+	 * @param string $algorithm Algorithm to use
+	 * @param string $type Type of object
 	 */
-	public function __construct($type = 'JWT', $algorithm = 'HS256', $key = null)
+	public function __construct($key, $algorithm = 'HS256', $type = 'JWT')
 	{
 		$this->setType($type);
 		$this->setAlgorithm($algorithm);
-		if ($key !== null) {
-			$this->setKey($key);
-		}
+		$this->setKey($key);
 	}
 
 	/**
