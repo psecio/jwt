@@ -16,6 +16,9 @@ class AudienceTest extends \PHPUnit_Framework_TestCase
 		unset($this->claim);
 	}
 
+	/**
+	 * Test that the right type is returned for Audience
+	 */
 	public function testGetType()
 	{
 		$type = $this->claim->getType();
