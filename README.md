@@ -50,7 +50,8 @@ require_once 'vendor/autoload.php';
 $key = "example_key";
 
 $header = new \Psecio\Jwt\Header();
-$header->setKey($key);
+$header->setKey($key)
+	->setEncryption('AES-256-CBC');
 
 $jwt = new \Psecio\Jwt\Jwt($header);
 
@@ -59,8 +60,7 @@ $jwt
     ->audience('http://example.com')
 	->issuedAt(1356999524)
 	->notBefore(1357000000)
-	->setEncryptionAlgorithm('AES-256-CBC')
-	->setEncryptionIv('1234567812345678');
+	->setIv('1234567812345678');
 
 $result = $jwt->encode($key);
 ?>

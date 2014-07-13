@@ -120,13 +120,14 @@ class Jwt
 	 * @param boolean $encrypt Encrypt the result [optional]
 	 * @return string Encoded data, appended by periods
 	 */
-	public function encode($key, $encrypt = false)
+	public function encode()
 	{
 		$header = $this->getHeader();
 		$sections = array(
 			$this->base64Encode(json_encode($header->toArray())),
 			$this->base64Encode(json_encode($this->getClaims()->toArray()))
 		);
+		$key = $this->getHeader()->getKey();
 
 		$signWith = implode('.', $sections);
 		$signature = $this->sign(
@@ -140,10 +141,6 @@ class Jwt
 		}
 
 		$result = implode('.', $sections);
-
-		if ($encrypt === true) {
-			$result = $this->encrypt($result, $key);
-		}
 
 		return $result;
 	}
