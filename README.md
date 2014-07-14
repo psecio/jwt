@@ -5,6 +5,18 @@ JWT (JSON Web Token) Creation and Decoding Library
 
 This library allows for the creation and decoding of JWT (JSON Web Tokens).
 
+### Installation
+
+This tool can be installed via Composer:
+
+```
+{
+	"require": {
+		"psecio/jwt": "1.*"
+	}
+}
+```
+
 ### Example Usage
 
 In the example below, the `JWT` object is created and a `Header` instance is assigned (required). The `JWt` object is then
