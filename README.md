@@ -84,6 +84,27 @@ echo "DECRYPTED: ".var_export($jwt->decrypt($result, 'AES-256-CBC', '12345678123
 ?>
 ```
 
+### Custom Claim values
+
+You can also add your own custom claim values to the JWT payload using the `custom` method. The first paramater is the value and the second is the claim "type" (key):
+
+```php
+<?php
+require_once 'vendor/autoload.php';
+
+$key = "example_key";
+
+$header = new \Psecio\Jwt\Header($key);
+
+$jwt = new \Psecio\Jwt\Jwt($header);
+$jwt->custom('foobar', 'custom-claim');
+
+$result = $jwt->encode();
+echo 'ENCODED: '.print_r($result)."\n\n";
+echo 'DECODED: '.var_export($jwt->decode($result), true);
+?>
+```
+
 You can use any of the OpenSSL cypher methods provided by the [openssl_get_cipher_methods](http://us3.php.net/openssl_get_cipher_methods) on your system.
 
 ### Supported Claim Types
@@ -95,6 +116,7 @@ You can use any of the OpenSSL cypher methods provided by the [openssl_get_ciphe
 - JwtId (jit)
 - Not Before (nbf)
 - Subject (sub)
+- Custom
 
 ### Documentation for JSON Web Tokens
 
