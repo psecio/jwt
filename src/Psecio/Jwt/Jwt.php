@@ -121,8 +121,6 @@ class Jwt
 	 */
 	public function encode($claims = null)
 	{
-		echo 'claims:'.$claims;
-
 		$header = $this->getHeader();
 
 		$claims = ($claims !== null)
@@ -130,7 +128,6 @@ class Jwt
 
 		$sections = array(
 			$this->base64Encode(json_encode($header->toArray())),
-			// $this->base64Encode(json_encode($this->getClaims()->toArray()))
 			$claims
 		);
 		$key = $this->getHeader()->getKey();
@@ -300,15 +297,12 @@ class Jwt
 	 */
 	public function base64Decode($data)
 	{
-		$decoded = urldecode($data);
-
-		// pad it out to a multiple of 4
 		$decoded = str_pad(
-			$decoded,
-			4 - (strlen($decoded) % 4),
+			$data,
+			4 - (strlen($data) % 4),
 			'='
 		);
-		return base64_decode($decoded);
+        return base64_decode(strtr($decoded, '-_', '+/'));
 	}
 
 	/**
