@@ -339,7 +339,8 @@ class Jwt
 		// see if it matches one of our claim types
 		$className = "\\Psecio\\Jwt\\Claim\\".ucwords($name);
 		if (class_exists($className)) {
-			$claim = new $className($args[0]);
+			$type = (isset($args[1])) ? $args[1] : null;
+			$claim = new $className($args[0], $type);
 			$this->addClaim($claim);
 			return $this;
 		} else {
