@@ -3,11 +3,11 @@
 namespace Psecio\Jwt\Claim;
 
 /**
- * Claim type Custom
+ * Claim type Private
  *
  * @package Jwt
  */
-class Custom extends \Psecio\Jwt\Claim
+class Private extends \Psecio\Jwt\Claim
 {
 	protected $type;
 }
