@@ -31,7 +31,7 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetValue()
 	{
-		$type = $this->claim->getType();
-		$this->assertEquals('test123', $this->value);
+		$value = $this->claim->getValue();
+		$this->assertEquals($this->value, $value);
 	}
 }
