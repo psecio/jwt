@@ -86,7 +86,7 @@ echo "DECRYPTED: ".var_export($jwt->decrypt($result, 'AES-256-CBC', '12345678123
 
 ### Custom Claim values
 
-You can also add your own custom claim values to the JWT payload using the `private` method. The first paramater is the value and the second is the claim "type" (key):
+You can also add your own custom claim values to the JWT payload using the `custom` method. The first paramater is the value and the second is the claim "type" (key):
 
 ```php
 <?php
@@ -97,7 +97,7 @@ $key = "example_key";
 $header = new \Psecio\Jwt\Header($key);
 
 $jwt = new \Psecio\Jwt\Jwt($header);
-$jwt->private('foobar', 'custom-claim');
+$jwt->custom('foobar', 'custom-claim');
 
 $result = $jwt->encode();
 echo 'ENCODED: '.print_r($result)."\n\n";
