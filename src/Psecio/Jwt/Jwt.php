@@ -38,7 +38,7 @@ class Jwt
 	/**
 	 * Set the header instance
 	 *
-	 * @param PsecioJwtHeader $header [description]
+	 * @param \Psecio\Jwt\Header $header [description]
 	 * @return \Psecio\Jwt\Jwt Current Jwt instance
 	 */
 	public function setHeader(\Psecio\Jwt\Header $header)
@@ -209,6 +209,7 @@ class Jwt
 	 *
 	 * @param string $data Data to decrypt
 	 * @param string $algorithm Algorithm to use for decrypting the data
+	 * @param string $iv
 	 * @throws \DomainException If OpenSSL is not installed
 	 * @throws \InvalidArgumentException If incorrect number of sections is provided
 	 * @return string Decrypted data
