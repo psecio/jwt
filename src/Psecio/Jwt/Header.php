@@ -88,7 +88,7 @@ class Header
 
 	/**
 	 * Get the current algorithm setting
-	 * 	If "resolve" is set to true, it finds the value from the types array
+	 *  If "resolve" is set to true, it finds the value from the types array
 	 *  and returns that
 	 *
 	 * @param boolean $resolve Resolve the algorithm to its type

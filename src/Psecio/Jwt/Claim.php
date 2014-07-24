@@ -34,7 +34,8 @@ abstract class Claim
 	 * Set the claim value
 	 *
 	 * @param string $value Claim value
-	 * @return \Psecio\Jwt\Claims instance
+	 * @return \Psecio\Jwt\Claim instance
+	 * @throws \DomainException
 	 */
 	public function setValue($value)
 	{
@@ -63,7 +64,7 @@ abstract class Claim
 	 * Set the claim type
 	 *
 	 * @param string $type Claim type
-	 * @return \Psecio\Jwt\Claims instance
+	 * @return \Psecio\Jwt\Claim instance
 	 */
 	public function setType($type)
 	{

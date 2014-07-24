@@ -6,14 +6,14 @@ class ClaimsCollection
 {
 	/**
 	 * Set of Claims
-	 * @var array
+	 * @var \Psecio\Jwt\Claim[]
 	 */
 	private $claims = array();
 
 	/**
 	 * Add a claim to the collection
 	 *
-	 * @param \Psecio\Jwt\Claims $claim Claim instance
+	 * @param \Psecio\Jwt\Claim $claim Claim instance
 	 * @return \Psecio\Jwt\ClaimsCollection instance
 	 */
 	public function add(\Psecio\Jwt\Claim $claim)
