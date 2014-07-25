@@ -154,15 +154,15 @@ class Jwt
 	 *
 	 * @param string $data Data to decode (entire JWT data string)
 	 * @param boolean $verify Verify the signature on the data [optional]
-	 * @throws \InvalidArgumentException If invalid number of sections
-	 * @throws \DomainException If signature doesn't verify
+	 * @throws Exception\DecodeException If invalid number of sections
+	 * @throws Exception\BadSignatureException If signature doesn't verify
 	 * @return \stdClass Decoded claims data
 	 */
 	public function decode($data, $verify = true)
 	{
 		$sections = explode('.', $data);
 		if (count($sections) < 3) {
-			throw new \InvalidArgumentException('Invalid number of sections (<3)');
+			throw new Exception\DecodeException('Invalid number of sections (<3)');
 		}
 
 		list($header, $claims, $signature) = $sections;
@@ -173,7 +173,7 @@ class Jwt
 
 		if ($verify === true) {
 			if ($this->verify($key, $header, $claims, $signature) === false){
-				throw new \DomainException('Signature did not verify');
+				throw new Exception\BadSignatureException('Signature did not verify');
 			}
 		}
 
@@ -185,13 +185,13 @@ class Jwt
 	 *
 	 * @param string $algorithm Algorithm to use for encryption
 	 * @param string $iv IV for encrypting data
-	 * @throws \DomainException If OpenSSL is not enabled
+	 * @throws \RuntimeException If OpenSSL is not enabled
 	 * @return string Encrypted string
 	 */
 	public function encrypt($algorithm, $iv)
 	{
 		if (!function_exists('openssl_encrypt')) {
-			throw new \DomainException('Cannot encrypt data, OpenSSL not enabled');
+			throw new \RuntimeException('Cannot encrypt data, OpenSSL not enabled');
 		}
 
 		$key = $this->getHeader()->getKey();
@@ -210,20 +210,20 @@ class Jwt
 	 * @param string $data Data to decrypt
 	 * @param string $algorithm Algorithm to use for decrypting the data
 	 * @param string $iv
-	 * @throws \DomainException If OpenSSL is not installed
-	 * @throws \InvalidArgumentException If incorrect number of sections is provided
+	 * @throws \RuntimeException If OpenSSL is not installed
+	 * @throws Exception\DecodeException If incorrect number of sections is provided
 	 * @return string Decrypted data
 	 */
 	public function decrypt($data, $algorithm, $iv)
 	{
 		if (!function_exists('openssl_encrypt')) {
-			throw new \DomainException('Cannot encrypt data, OpenSSL not enabled');
+			throw new \RuntimeException('Cannot encrypt data, OpenSSL not enabled');
 		}
 
 		// Decrypt just the claims
 		$sections = explode('.', $data);
 		if (count($sections) < 3) {
-			throw new \InvalidArgumentException('Invalid number of sections (<3)');
+			throw new Exception\DecodeException('Invalid number of sections (<3)');
 		}
 
 		$key = $this->getHeader()->getKey();
@@ -241,30 +241,30 @@ class Jwt
 	 * @param \stdClass $header Header data (object)
 	 * @param \stdClass $claims Set of claims
 	 * @param string $signature Signature string
-	 * @throws \InvalidArgumentException If no algorithm is specified
-	 * @throws \InvalidArgumentException If the message has expired
-	 * @throws \DomainException If Audience is not defined
-	 * @throws \DomainException Processing before time not allowed
+	 * @throws Exception\DecodeException If no algorithm is specified
+	 * @throws Exception\ExpiredException If the message has expired
+	 * @throws Exception\DecodeException If Audience is not defined
+	 * @throws Exception\DecodeException Processing before time not allowed
 	 * @return boolean Pass/fail of verification
 	 */
 	public function verify($key, $header, $claims, $signature)
 	{
 		if (empty($header->alg)) {
-			throw new \InvalidArgumentException('Invalid header: no algorithm specified');
+			throw new Exception\DecodeException('Invalid header: no algorithm specified');
 		}
 
 		if (!isset($claims->aud) || empty($claims->aud)) {
-			throw new \DomainException('Audience not defined [aud]');
+			throw new Exception\DecodeException('Audience not defined [aud]');
 		}
 
 		// If "expires at" defined, check against time
 		if (isset($claims->exp) && $claims->exp <= time()) {
-			throw new \InvalidArgumentException('Message has expired');
+			throw new Exception\ExpiredException('Message has expired');
 		}
 
 		// If a "not before" is provided, validate the time
 		if (isset($claims->nbf) && $claims->nbf > time()) {
-			throw new \DomainException(
+			throw new Exception\DecodeException(
 				'Cannot process prior to '.date('m.d.Y H:i:s', $claims->nbf).' [nbf]'
 			);
 		}
