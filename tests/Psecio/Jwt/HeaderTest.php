@@ -64,7 +64,7 @@ class HeaderTest extends \PHPUnit_Framework_TestCase
 		$algorithm = 'H256';
 		$header = new Header('testkey', $algorithm);
 		$this->assertEquals(
-			$header->getAlgorithm(),
+			$header->getAlgorithm(false),
 			$algorithm
 		);
 	}
