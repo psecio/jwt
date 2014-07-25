@@ -34,4 +34,21 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
 		$value = $this->claim->getValue();
 		$this->assertEquals($this->value, $value);
 	}
+
+	/**
+	 * Test the conversion of the claim to an array
+	 */
+	public function testToArray()
+	{
+		$value = 'test-claim';
+		$claim = new ClaimStub($value);
+
+		$this->assertEquals(
+			$claim->toArray(),
+			array(
+				'value' => $value,
+				'type' => 'stub'
+			)
+		);
+	}
 }
