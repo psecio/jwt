@@ -62,7 +62,8 @@ The JWT Library also supports encryption of the resulting JWT-formatted string. 
 
 require_once 'vendor/autoload.php';
 
-$key = "example_key";
+$key = 'example_key';
+$encryptKey = 'my-encryption-key';
 
 $header = new \Psecio\Jwt\Header($key);
 $jwt = new \Psecio\Jwt\Jwt($header);
@@ -76,10 +77,10 @@ $jwt
 	->jwtId('id123456')
 	->type('https://example.com/register');
 
-$result = $jwt->encrypt('AES-256-CBC', '1234567812345678');
+$result = $jwt->encrypt('AES-256-CBC', '1234567812345678', $encryptKey);
 
 echo 'ENCRYPTED: '.var_export($result, true)."\n";
-echo "DECRYPTED: ".var_export($jwt->decrypt($result, 'AES-256-CBC', '1234567812345678'), true)."\n";
+echo "DECRYPTED: ".var_export($jwt->decrypt($result, 'AES-256-CBC', '1234567812345678', $encryptKey), true)."\n";
 
 ?>
 ```

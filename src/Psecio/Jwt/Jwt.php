@@ -188,13 +188,12 @@ class Jwt
 	 * @throws \RuntimeException If OpenSSL is not enabled
 	 * @return string Encrypted string
 	 */
-	public function encrypt($algorithm, $iv)
+	public function encrypt($algorithm, $iv, $key)
 	{
 		if (!function_exists('openssl_encrypt')) {
 			throw new \RuntimeException('Cannot encrypt data, OpenSSL not enabled');
 		}
 
-		$key = $this->getHeader()->getKey();
 		$data = json_encode($this->getClaims()->toArray());
 
 		$claims = $this->base64Encode(openssl_encrypt(
@@ -214,7 +213,7 @@ class Jwt
 	 * @throws Exception\DecodeException If incorrect number of sections is provided
 	 * @return string Decrypted data
 	 */
-	public function decrypt($data, $algorithm, $iv)
+	public function decrypt($data, $algorithm, $iv, $key)
 	{
 		if (!function_exists('openssl_encrypt')) {
 			throw new \RuntimeException('Cannot encrypt data, OpenSSL not enabled');
@@ -226,7 +225,6 @@ class Jwt
 			throw new Exception\DecodeException('Invalid number of sections (<3)');
 		}
 
-		$key = $this->getHeader()->getKey();
 		$claims = openssl_decrypt(
 			$this->base64Decode($sections[1]), $algorithm, $key, false, $iv
 		);
