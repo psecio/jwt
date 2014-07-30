@@ -105,7 +105,6 @@ class Jwt
 			$this->base64Encode(json_encode($header->toArray())),
 			$claims
 		);
-		$key = $this->getHeader()->getKey();
 
 		$signWith = implode('.', $sections);
 		$signature = $this->sign(
@@ -284,10 +283,9 @@ class Jwt
 	 *
 	 * @param string $signWith Data to sign hash with
 	 * @param string $key Key for signing
-	 * @param string $algorithm Algorithm type
 	 * @return string Generated signature hash
 	 */
-	public function sign($signWith, $key, $algorithm)
+	public function sign($signWith, $key)
 	{
 		$signature = hash_hmac(
 			$this->getHeader()->getAlgorithm(true),
