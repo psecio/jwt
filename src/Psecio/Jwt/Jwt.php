@@ -16,9 +16,6 @@ class Jwt
 	 */
 	private $header;
 
-	private $encryptAlgorithm;
-	private $encryptIv;
-
 	/**
 	 * Initialize the object and set the header and claims collection
 	 * 	Empty claims collection is set if none is given
@@ -88,28 +85,6 @@ class Jwt
 	public function setClaims(\Psecio\Jwt\ClaimsCollection $collection)
 	{
 		$this->claims = $collection;
-		return $this;
-	}
-
-	public function getEncryptAlgorithm()
-	{
-		return $this->encryptAlgorithm;
-	}
-
-	public function getEncryptIv()
-	{
-		return $this->encryptIv;
-	}
-
-	public function setEncryptionAlgorithm($algorithm)
-	{
-		$this->encryptAlgorithm = $algorithm;
-		return $this;
-	}
-
-	public function setEncryptionIv($iv)
-	{
-		$this->encryptIv = $iv;
 		return $this;
 	}
 
