@@ -222,7 +222,7 @@ class Jwt
 
         $token = implode('.', $sections);
 
-        return $token;
+        return $this->decode($token);
     }
 
     /**

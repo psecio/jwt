@@ -65,9 +65,8 @@ class JwtTest extends \PHPUnit_Framework_TestCase
              ->expireTime($expire)
              ->jwtId('12345')
              ->type('https://example.com/register');
-        $result  = $this->jwt->encrypt($cipher, $iv, $key);
-        $decrypt = $this->jwt->decrypt($result, $cipher, $iv, $key);
-        $decode  = $this->jwt->decode($decrypt);
+        $result = $this->jwt->encrypt($cipher, $iv, $key);
+        $decode = $this->jwt->decrypt($result, $cipher, $iv, $key);
 
         $this->assertEquals((array) $decode, array(
             'iss' => 'http://example.org',
