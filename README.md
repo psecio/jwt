@@ -11,9 +11,9 @@ This tool can be installed via Composer:
 
 ```
 {
-	"require": {
-		"psecio/jwt": "1.*"
-	}
+    "require": {
+        "psecio/jwt": "1.*"
+    }
 }
 ```
 
@@ -40,11 +40,11 @@ $jwt = new \Psecio\Jwt\Jwt($header);
 $jwt
     ->issuer('http://example.org')
     ->audience('http://example.com')
-	->issuedAt(1356999524)
-	->notBefore(1357000000)
-	->expireTime(time()+3600)
-	->jwtId('id123456')
-	->type('https://example.com/register');
+    ->issuedAt(1356999524)
+    ->notBefore(1357000000)
+    ->expireTime(time()+3600)
+    ->jwtId('id123456')
+    ->type('https://example.com/register');
 
 $result = $jwt->encode();
 echo 'ENCODED: '.print_r($result)."\n\n";
@@ -71,16 +71,16 @@ $jwt = new \Psecio\Jwt\Jwt($header);
 $jwt
     ->issuer('http://example.org')
     ->audience('http://example.com')
-	->issuedAt(1356999524)
-	->notBefore(1357000000)
-	->expireTime(time()+3600)
-	->jwtId('id123456')
-	->type('https://example.com/register');
+    ->issuedAt(1356999524)
+    ->notBefore(1357000000)
+    ->expireTime(time()+3600)
+    ->jwtId('id123456')
+    ->type('https://example.com/register');
 
 $result = $jwt->encrypt('AES-256-CBC', '1234567812345678', $encryptKey);
 
 echo 'ENCRYPTED: '.var_export($result, true)."\n";
-echo "DECRYPTED: ".var_export($jwt->decrypt($result, 'AES-256-CBC', '1234567812345678', $encryptKey), true)."\n";
+echo "DECRYPTED: ".var_export($jwt->decode($jwt->decrypt($result, 'AES-256-CBC', '1234567812345678', $encryptKey), true))."\n";
 
 ?>
 ```
