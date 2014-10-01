@@ -80,7 +80,7 @@ $jwt
 $result = $jwt->encrypt('AES-256-CBC', '1234567812345678', $encryptKey);
 
 echo 'ENCRYPTED: '.var_export($result, true)."\n";
-echo "DECRYPTED: ".var_export($jwt->decode($jwt->decrypt($result, 'AES-256-CBC', '1234567812345678', $encryptKey), true))."\n";
+echo "DECRYPTED: ".var_export($jwt->decrypt($result, 'AES-256-CBC', '1234567812345678', $encryptKey), true)."\n";
 
 ?>
 ```
