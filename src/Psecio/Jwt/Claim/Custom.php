@@ -9,5 +9,5 @@ namespace Psecio\Jwt\Claim;
  */
 class Custom extends \Psecio\Jwt\Claim
 {
-	protected $type;
+    protected $type;
 }

@@ -2,4 +2,6 @@
 
 namespace Psecio\Jwt\Exception;
 
-class DecodeException extends \DomainException {}
+class DecodeException extends \DomainException
+{
+}

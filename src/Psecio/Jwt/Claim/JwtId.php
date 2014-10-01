@@ -9,5 +9,5 @@ namespace Psecio\Jwt\Claim;
  */
 class JwtId extends \Psecio\Jwt\Claim
 {
-	protected $type = 'jti';
+    protected $type = 'jti';
 }

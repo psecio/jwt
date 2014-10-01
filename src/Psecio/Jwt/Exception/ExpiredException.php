@@ -2,4 +2,6 @@
 
 namespace Psecio\Jwt\Exception;
 
-class ExpiredException extends DecodeException {}
+class ExpiredException extends DecodeException
+{
+}
