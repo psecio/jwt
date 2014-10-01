@@ -1,14 +1,16 @@
 <?php
 
-namespace Psecio\Jwt\Claim;
+namespace PsecioTest\Jwt\Claim;
 
-class ExpireTimeTest extends \PHPUnit_Framework_TestCase
+use Psecio\Jwt\Claim\IssuedAt;
+
+class IssuedAtTest extends \PHPUnit_Framework_TestCase
 {
     private $claim;
 
     public function setUp()
     {
-        $this->claim = new ExpireTime(time());
+        $this->claim = new IssuedAt(time());
     }
 
     public function tearDown()
@@ -22,7 +24,7 @@ class ExpireTimeTest extends \PHPUnit_Framework_TestCase
     public function testGetType()
     {
         $type = $this->claim->getType();
-        $this->assertEquals('exp', $type);
+        $this->assertEquals('iat', $type);
     }
 
     /**
@@ -33,6 +35,6 @@ class ExpireTimeTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidData()
     {
-        $claim = new ExpireTime('bad-data');
+        $claim = new IssuedAt('bad-data');
     }
 }

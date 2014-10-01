@@ -1,6 +1,6 @@
 <?php
 
-namespace Psecio\Jwt;
+namespace PsecioTest\Jwt;
 
 class ClaimTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,14 +1,16 @@
 <?php
 
-namespace Psecio\Jwt\Claim;
+namespace PsecioTest\Jwt\Claim;
 
-class JwtIdTest extends \PHPUnit_Framework_TestCase
+use Psecio\Jwt\Claim\Issuer;
+
+class IssuerTest extends \PHPUnit_Framework_TestCase
 {
     private $claim;
 
     public function setUp()
     {
-        $this->claim = new JwtId('test');
+        $this->claim = new Issuer('test');
     }
 
     public function tearDown()
@@ -22,6 +24,6 @@ class JwtIdTest extends \PHPUnit_Framework_TestCase
     public function testGetType()
     {
         $type = $this->claim->getType();
-        $this->assertEquals('jti', $type);
+        $this->assertEquals('iss', $type);
     }
 }

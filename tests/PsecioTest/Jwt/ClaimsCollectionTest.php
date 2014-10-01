@@ -1,8 +1,8 @@
 <?php
 
-namespace Psecio\Jwt;
+namespace PsecioTest\Jwt;
 
-require "ClaimStub.php";
+use Psecio\Jwt\ClaimsCollection;
 
 class ClaimsCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class ClaimsCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddSingleClaim()
     {
-        $claim = new \PSecio\Jwt\ClaimStub('test1');
+        $claim = new ClaimStub('test1');
         $this->collection->add($claim);
         $result = $this->collection->toArray();
 
@@ -35,9 +35,9 @@ class ClaimsCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddMultipleClaim()
     {
-        $claim1 = new \PSecio\Jwt\ClaimStub('test1', 'claim1');
-        $claim2 = new \PSecio\Jwt\ClaimStub('test2', 'claim2');
-        $claim3 = new \PSecio\Jwt\ClaimStub('test3', 'claim3');
+        $claim1 = new ClaimStub('test1', 'claim1');
+        $claim2 = new ClaimStub('test2', 'claim2');
+        $claim3 = new ClaimStub('test3', 'claim3');
 
         $this->collection->add($claim1);
         $this->collection->add($claim2);

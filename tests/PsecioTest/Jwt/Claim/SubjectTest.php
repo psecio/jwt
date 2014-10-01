@@ -1,14 +1,16 @@
 <?php
 
-namespace Psecio\Jwt\Claim;
+namespace PsecioTest\Jwt\Claim;
 
-class AudienceTest extends \PHPUnit_Framework_TestCase
+use Psecio\Jwt\Claim\Subject;
+
+class SubjectTest extends \PHPUnit_Framework_TestCase
 {
     private $claim;
 
     public function setUp()
     {
-        $this->claim = new Audience('test');
+        $this->claim = new Subject('test');
     }
 
     public function tearDown()
@@ -22,6 +24,6 @@ class AudienceTest extends \PHPUnit_Framework_TestCase
     public function testGetType()
     {
         $type = $this->claim->getType();
-        $this->assertEquals('aud', $type);
+        $this->assertEquals('sub', $type);
     }
 }

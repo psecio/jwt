@@ -21,7 +21,8 @@
     },
     "autoload": {
         "psr-0": {
-            "Psecio": "src/"
+            "Psecio": "src/",
+            "PsecioTest": "tests/"
         }
     }
 }

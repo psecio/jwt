@@ -1,6 +1,8 @@
 <?php
 
-namespace Psecio\Jwt;
+namespace PsecioTest\Jwt;
+
+use Psecio\Jwt\Header;
 
 class HeaderTest extends \PHPUnit_Framework_TestCase
 {

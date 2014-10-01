@@ -1,6 +1,8 @@
 <?php
 
-namespace Psecio\Jwt\Claim;
+namespace PsecioTest\Jwt\Claim;
+
+use Psecio\Jwt\Claim\NotBefore;
 
 class NotBeforeTest extends \PHPUnit_Framework_TestCase
 {

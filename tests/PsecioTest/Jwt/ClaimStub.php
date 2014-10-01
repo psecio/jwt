@@ -1,6 +1,6 @@
 <?php
 
-namespace Psecio\Jwt;
+namespace PsecioTest\Jwt;
 
 class ClaimStub extends \Psecio\Jwt\Claim
 {
