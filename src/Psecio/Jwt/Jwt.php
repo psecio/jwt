@@ -99,10 +99,13 @@ class Jwt
 		$header = $this->getHeader();
 
 		$claims = ($claims !== null)
-			? $claims : $this->base64Encode(json_encode($this->getClaims()->toArray()));
+			? $claims
+			: $this->base64Encode(
+				json_encode($this->getClaims()->toArray(), JSON_UNESCAPED_SLASHES)
+			);
 
 		$sections = array(
-			$this->base64Encode(json_encode($header->toArray())),
+			$this->base64Encode(json_encode($header->toArray(), JSON_UNESCAPED_SLASHES)),
 			$claims
 		);
 
@@ -168,7 +171,7 @@ class Jwt
 			throw new \RuntimeException('Cannot encrypt data, OpenSSL not enabled');
 		}
 
-		$data = json_encode($this->getClaims()->toArray());
+		$data = json_encode($this->getClaims()->toArray(), JSON_UNESCAPED_SLASHES);
 
 		$claims = $this->base64Encode(openssl_encrypt(
 			$data, $algorithm, $key, false, $iv
@@ -243,8 +246,8 @@ class Jwt
 
 		$algorithm = $header->alg;
 		$signWith = implode('.', array(
-			$this->base64Encode(json_encode($header)),
-			$this->base64Encode(json_encode($claims))
+			$this->base64Encode(json_encode($header, JSON_UNESCAPED_SLASHES)),
+			$this->base64Encode(json_encode($claims, JSON_UNESCAPED_SLASHES))
 		));
 		return ($this->sign($signWith, $key, $algorithm) === $signature);
 	}
