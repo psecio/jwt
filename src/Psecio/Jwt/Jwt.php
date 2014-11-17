@@ -18,14 +18,17 @@ class Jwt
 
 	/**
 	 * Initialize the object and set the header and claims collection
-	 * 	Empty claims collection is set if none is given
+	 *  Empty claims collection is set if none is given
 	 *
 	 * @param \Psecio\Jwt\Header $header Header instance to set on JWT object
 	 * @param \Psecio\Jwt\ClaimsCollection $collection Claims collection [optional]
 	 */
-	public function __construct(\Psecio\Jwt\Header $header, \Psecio\Jwt\ClaimsCollection $collection = null)
+	public function __construct(\Psecio\Jwt\Header $header = null, \Psecio\Jwt\ClaimsCollection $collection = null)
 	{
-		$this->setHeader($header);
+		if (!is_null($header)) {
+			$this->setHeader($header);
+		}
+
 		if ($collection == null) {
 			$collection = new \Psecio\Jwt\ClaimsCollection();
 		}
@@ -127,15 +130,17 @@ class Jwt
 
 	/**
 	 * Decode the data with the given key
-	 * 	Optional "verify" parameter validates the signature as well (default is on)
 	 *
-	 * @param string $data Data to decode (entire JWT data string)
-	 * @param boolean $verify Verify the signature on the data [optional]
 	 * @throws Exception\DecodeException If invalid number of sections
 	 * @throws Exception\BadSignatureException If signature doesn't verify
+	 *
+	 * @param string $data Data to decode (entire JWT data string)
+	 * @param string $key
+	 * @param boolean $verify Verify the signature on the data, defaults to true [optional]
+	 * @param boolean $check Check all the claims are correct, defaults to true [optional]
 	 * @return \stdClass Decoded claims data
 	 */
-	public function decode($data, $verify = true)
+	public function decode($data, $key, $verify = true, $check = true)
 	{
 		$sections = explode('.', $data);
 		if (count($sections) < 3) {
@@ -143,15 +148,18 @@ class Jwt
 		}
 
 		list($header, $claims, $signature) = $sections;
+		$signWith = $header . '.' . $claims;
+
 		$header = json_decode($this->base64Decode($header));
 		$claims = json_decode($this->base64Decode($claims));
 		$signature = $this->base64Decode($signature);
-		$key = $this->getHeader()->getKey();
 
 		if ($verify === true) {
-			if ($this->verify($key, $header, $claims, $signature) === false){
-				throw new Exception\BadSignatureException('Signature did not verify');
-			}
+			$this->verify($signWith, $signature, $header, $key);
+		}
+
+		if ($check === true) {
+			$this->check($claims);
 		}
 
 		return $claims;
@@ -162,6 +170,7 @@ class Jwt
 	 *
 	 * @param string $algorithm Algorithm to use for encryption
 	 * @param string $iv IV for encrypting data
+	 * @param string $key
 	 * @throws \RuntimeException If OpenSSL is not enabled
 	 * @return string Encrypted string
 	 */
@@ -177,57 +186,83 @@ class Jwt
 			$data, $algorithm, $key, false, $iv
 		));
 
-		return $this->encode($claims);
+		return $this->encode($claims, $key);
 	}
 
 	/**
 	 * Decrypt given data wtih given key (and algorithm/IV)
 	 *
+	 * @throws \RuntimeException If OpenSSL is not installed
+	 * @throws Exception\DecodeException If incorrect number of sections is provided
+	 *
 	 * @param string $data Data to decrypt
 	 * @param string $algorithm Algorithm to use for decrypting the data
 	 * @param string $iv
-	 * @throws \RuntimeException If OpenSSL is not installed
-	 * @throws Exception\DecodeException If incorrect number of sections is provided
-	 * @return string Decrypted data
+	 * @param string $key
+	 * @return \stdClass Decrypted data
 	 */
 	public function decrypt($data, $algorithm, $iv, $key)
 	{
-		if (!function_exists('openssl_encrypt')) {
-			throw new \RuntimeException('Cannot encrypt data, OpenSSL not enabled');
+		if (!function_exists('openssl_decrypt')) {
+			throw new \RuntimeException('Cannot decrypt data, OpenSSL not enabled');
 		}
 
-		// Decrypt just the claims
+		// First check the signature.
+		$valid = $this->decode($data, $key, true, false);
+
+		// Now decrypt the claims and check them (we can assume that data is valid now!)
 		$sections = explode('.', $data);
-		if (count($sections) < 3) {
-			throw new Exception\DecodeException('Invalid number of sections (<3)');
-		}
-
-		$claims = openssl_decrypt(
+		$claims = json_decode(openssl_decrypt(
 			$this->base64Decode($sections[1]), $algorithm, $key, false, $iv
-		);
+		));
 
-		return json_decode($claims);
+		if ($this->check($claims)) {
+			return $claims;
+		}
 	}
 
 	/**
-	 * Verify the signature on the JWT message
+	 * Verifies that the data of the token matches the signature.
 	 *
-	 * @param string $key Key used for hashing
-	 * @param \stdClass $header Header data (object)
-	 * @param \stdClass $claims Set of claims
-	 * @param string $signature Signature string
 	 * @throws Exception\DecodeException If no algorithm is specified
-	 * @throws Exception\ExpiredException If the message has expired
-	 * @throws Exception\DecodeException If Audience is not defined
-	 * @throws Exception\DecodeException Processing before time not allowed
-	 * @return boolean Pass/fail of verification
+	 *
+	 * @param string $data
+	 * @param strign $signature
+	 * @param \stdClass $header
+	 * @param string $key
+	 * @return string
 	 */
-	public function verify($key, $header, $claims, $signature)
+	public function verify($data, $signature, $header, $key)
 	{
 		if (empty($header->alg)) {
 			throw new Exception\DecodeException('Invalid header: no algorithm specified');
 		}
 
+		// Create a Header class from the token header (if required)
+		if (is_null($this->getHeader())) {
+			$this->setHeader(new Header($key, $header->alg));
+		}
+
+		// Do the signatures match?
+		if ($this->equals($signature, $this->sign($data, $key))) {
+			return true;
+		} else {
+			throw new Exception\BadSignatureException('Signature did not verify');
+		}
+	}
+
+	/**
+	 * Check the claims to ensure the token is still valid.
+	 *
+	 * @throws Exception\ExpiredException If the message has expired
+	 * @throws Exception\DecodeException If Audience is not defined
+	 * @throws Exception\DecodeException Processing before time not allowed
+	 *
+	 * @param \stdClass $claims Set of claims
+	 * @return boolean Pass/fail of verification
+	 */
+	public function check($claims)
+	{
 		if (!isset($claims->aud) || empty($claims->aud)) {
 			throw new Exception\DecodeException('Audience not defined [aud]');
 		}
@@ -244,17 +279,12 @@ class Jwt
 			);
 		}
 
-		$algorithm = $header->alg;
-		$signWith = implode('.', array(
-			$this->base64Encode(json_encode($header, JSON_UNESCAPED_SLASHES)),
-			$this->base64Encode(json_encode($claims, JSON_UNESCAPED_SLASHES))
-		));
-		return ($this->sign($signWith, $key, $algorithm) === $signature);
+		return true;
 	}
 
 	/**
 	 * Base64 encode data and prepare for the URL
-	 * 	NOTE: The "=" is removed as it's just padding in base64
+	 *  NOTE: The "=" is removed as it's just padding in base64
 	 *  and not needed.
 	 *
 	 * @param string $data Data string
@@ -278,7 +308,7 @@ class Jwt
 			4 - (strlen($data) % 4),
 			'='
 		);
-        return base64_decode(strtr($decoded, '-_', '+/'));
+		return base64_decode(strtr($decoded, '-_', '+/'));
 	}
 
 	/**
@@ -301,12 +331,33 @@ class Jwt
 	}
 
 	/**
+     * A constant time equals function.
+     *
+     * @link https://github.com/firebase/php-jwt/blob/master/Authentication/JWT.php
+	 * @param string $known
+	 * @param string $generated
+	 * @return boolean
+	 */
+	private function equals($known, $generated)
+	{
+		$len = min(strlen($known), strlen($generated));
+		$status = 0;
+		for ($i = 0; $i < $len; $i++) {
+			$status |= (ord($known[$i]) ^ ord($generated[$i]));
+		}
+		$status |= (strlen($known) ^ strlen($generated));
+
+		return $status === 0;
+	}
+
+	/**
 	 * Magic method for setting claims by name
-	 * 	Ex. "issuedAt()" calls Claims\IssuedAt
+	 *  Ex. "issuedAt()" calls Claims\IssuedAt
+	 *
+	 * @throws \InvalidArgumentException If invalid claim type
 	 *
 	 * @param string $name Function name
 	 * @param array $args Arguments to pass
-	 * @throws \InvalidArgumentException If invalid claim type
 	 * @return \Psecio\Jwt\Jwt instance
 	 */
 	public function __call($name, $args)
