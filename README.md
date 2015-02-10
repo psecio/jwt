@@ -100,6 +100,12 @@ $header = new \Psecio\Jwt\Header($key);
 $jwt = new \Psecio\Jwt\Jwt($header);
 $jwt->custom('foobar', 'custom-claim');
 
+// Or, you can add more than one at the same time with an array
+$jwt->custom(array(
+    'custom-claim' => 'foorbar',
+    'key1' => 'value1'
+));
+
 $result = $jwt->encode();
 echo 'ENCODED: '.print_r($result)."\n\n";
 echo 'DECODED: '.var_export($jwt->decode($result), true);

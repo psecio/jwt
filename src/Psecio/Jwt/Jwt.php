@@ -322,4 +322,21 @@ class Jwt
 			throw new \InvalidArgumentException('Invalid claim type "'.$name.'"');
 		}
 	}
+
+	/**
+	 * Allow for the insertion of multiple custom values at once
+	 *
+	 * @param string|array $value Either a string for a single claim or array for multiple
+	 * @param string $name Name of claim to use if string given for "name" [optional]
+	 * @return \Psecio\Jwt\Jwt instance
+	 */
+	public function custom($value, $name = null)
+	{
+		$value = (!is_array($value)) ? array($name => $value) : $value;
+		foreach ($value as $claim => $value) {
+			$claim = new \Psecio\Jwt\Claim\Custom($value, $claim);
+			$this->addClaim($claim);
+		}
+		return $this;
+	}
 }
