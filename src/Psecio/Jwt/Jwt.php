@@ -315,7 +315,7 @@ class Jwt
 		$className = "\\Psecio\\Jwt\\Claim\\".ucwords($name);
 		if (class_exists($className)) {
 			$type = (isset($args[1])) ? $args[1] : null;
-			$claim = new $className($args[0], $type);
+			$claim = new $className($args[0]);
 			$this->addClaim($claim);
 			return $this;
 		} else {
@@ -333,8 +333,8 @@ class Jwt
 	public function custom($value, $name = null)
 	{
 		$value = (!is_array($value)) ? array($name => $value) : $value;
-		foreach ($value as $claim => $value) {
-			$claim = new \Psecio\Jwt\Claim\Custom($value, $claim);
+		foreach ($value as $type => $value) {
+			$claim = new \Psecio\Jwt\Claim\Custom($value, $type);
 			$this->addClaim($claim);
 		}
 		return $this;

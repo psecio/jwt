@@ -25,9 +25,6 @@ abstract class Claim
 	public function __construct($value, $type = null)
 	{
 		$this->setValue($value);
-		if ($type !== null) {
-			$this->setType($type);
-		}
 	}
 
 	/**
@@ -58,18 +55,6 @@ abstract class Claim
 	public function getValue()
 	{
 		return $this->value;
-	}
-
-	/**
-	 * Set the claim type
-	 *
-	 * @param string $type Claim type
-	 * @return \Psecio\Jwt\Claim instance
-	 */
-	public function setType($type)
-	{
-		$this->type = $type;
-		return $this;
 	}
 
 	/**

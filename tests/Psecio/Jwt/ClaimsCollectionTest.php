@@ -35,9 +35,9 @@ class ClaimsCollectionTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testAddMultipleClaim()
 	{
-		$claim1 = new \PSecio\Jwt\ClaimStub('test1', 'claim1');
-		$claim2 = new \PSecio\Jwt\ClaimStub('test2', 'claim2');
-		$claim3 = new \PSecio\Jwt\ClaimStub('test3', 'claim3');
+		$claim1 = new \PSecio\Jwt\Claim\Audience('test1');
+		$claim2 = new \PSecio\Jwt\Claim\IssuedAt(time());
+		$claim3 = new \PSecio\Jwt\Claim\Type('test3');
 
 		$this->collection->add($claim1);
 		$this->collection->add($claim2);
@@ -46,7 +46,7 @@ class ClaimsCollectionTest extends \PHPUnit_Framework_TestCase
 		$result = $this->collection->toArray();
 
 		$this->assertCount(3, $result);
-		$this->assertEquals($result['claim1'], 'test1');
-		$this->assertEquals($result['claim3'], 'test3');
+		$this->assertEquals($result['aud'], 'test1');
+		$this->assertEquals($result['typ'], 'test3');
 	}
 }
