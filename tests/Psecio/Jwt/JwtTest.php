@@ -283,4 +283,81 @@ class JwtTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($jwt->verify($key, $header, $claims, $signature));
     }
+
+    /**
+     * Test the signing with private key data (verify decode)
+     */
+    public function testSignWithPrivateKeyValid()
+    {
+        $keyPath = 'file://'.__DIR__.'/../../private.pem';
+        $key = openssl_pkey_get_private($keyPath, 'test1234');
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setHashMethod('RS256');
+
+        $jwt = new \Psecio\Jwt\Jwt($header);
+        $jwt->audience('http://example.com');
+
+        $result = $jwt->encode();
+        $result = $jwt->decode($result);
+
+        $this->assertEquals($result->aud, 'http://example.com');
+    }
+
+    /**
+     * Test the signing with private key data (verify decode)
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSignWithPrivateKeyBadHashType()
+    {
+        $keyPath = 'file://'.__DIR__.'/../../private.pem';
+        $key = openssl_pkey_get_private($keyPath, 'test1234');
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setHashMethod('RS1234');
+
+        $jwt = new \Psecio\Jwt\Jwt($header);
+        $jwt->audience('http://example.com');
+
+        $result = $jwt->encode();
+        $result = $jwt->decode($result);
+
+        $this->assertEquals($result->aud, 'http://example.com');
+    }
+
+    /**
+     * Test the signing with private key data (verify decode)
+     * @expectedException \Psecio\Jwt\Exception\InvalidKeyException
+     */
+    public function testSignWithPrivateKeyInvalidKey()
+    {
+        $keyPath = 'file://'.__DIR__.'/../../private.pem';
+        $header = new \Psecio\Jwt\Header('test');
+        $header->setHashMethod('RS256');
+
+        $jwt = new \Psecio\Jwt\Jwt($header);
+        $jwt->audience('http://example.com');
+
+        $result = $jwt->encode();
+        $result = $jwt->decode($result);
+
+        $this->assertEquals($result->aud, 'http://example.com');
+    }
+
+    /**
+     * Test the signing with private key data (verify decode)
+     * @expectedException \Psecio\Jwt\Exception\InvalidKeyException
+     */
+    public function testSignWithPrivateKeySignFailure()
+    {
+        $keyPath = 'file://'.__DIR__.'/../../private.pem';
+        $header = new \Psecio\Jwt\Header('test');
+        $header->setHashMethod('RS256');
+
+        $jwt = new \Psecio\Jwt\Jwt($header);
+        $jwt->audience('http://example.com');
+
+        $result = $jwt->encode();
+        $result = $jwt->decode($result);
+
+        $this->assertEquals($result->audience, 'http://example.com');
+    }
 }
