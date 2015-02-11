@@ -292,13 +292,36 @@ class Jwt
 	 */
 	public function sign($signWith, $key)
 	{
-		$signature = hash_hmac(
-			$this->getHeader()->getAlgorithm(true),
-			$signWith,
-			$key,
-			true
-		);
+		$hashType = $this->getHeader()->getHashMethod();
 
+		if (strtolower($hashType) === 'hmac') {
+			$signature = hash_hmac(
+				$this->getHeader()->getAlgorithm(true),
+				$signWith,
+				$key,
+				true
+			);
+		} else {
+			$hash = '\\Psecio\\Jwt\\HashMethod\\'.$hashType;
+			if (class_exists($hash) === false) {
+				throw new \InvalidArgumentException('Invalid hash type: '.$hashType);
+			}
+			$hash = new $hash();
+
+			if ($hash->isValidKey($key) === false) {
+				throw new \InvalidArgumentException('Invalid key provided');
+			}
+
+			$result = openssl_sign(
+				$signWith,
+				$signature,
+				$key,
+				$hash->getAlgorithm()
+			);
+			if ($result === false) {
+				throw new \DomainException('Error signing with provided key');
+			}
+		}
 		return $signature;
 	}
 
