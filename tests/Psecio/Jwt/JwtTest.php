@@ -176,4 +176,111 @@ class JwtTest extends \PHPUnit_Framework_TestCase
 
         $decoded = $jwt->decode($result);
     }
+
+    /**
+     * Test the valid verification of a signature with verify() method
+     */
+    public function testVerifyJwtSignatureValid()
+    {
+        $key = 'test';
+        $header = new Header($key);
+        $jwt = new Jwt($header);
+
+        $jwt
+            ->issuer('http://example.org')
+            ->audience('http://example.com');
+
+        $header = (object)$jwt->getHeader()->toArray();
+        $claims = (object)$jwt->getClaims()->toArray();
+        $parts = explode('.', $jwt->encode());
+        $signature = $jwt->base64Decode($parts[2]);
+
+        $this->assertTrue($jwt->verify($key, $header, $claims, $signature));
+    }
+
+    /**
+     * Try the verify call on a JWT with no algorithm in the header
+     * @expectedException \Psecio\Jwt\Exception\DecodeException
+     */
+    public function testVerifyJwtSignatureNoAlg()
+    {
+        $key = 'test';
+        $header = new Header($key);
+        $jwt = new Jwt($header);
+
+        $jwt
+            ->issuer('http://example.org')
+            ->audience('http://example.com');
+
+        $claims = (object)$jwt->getClaims()->toArray();
+        $parts = explode('.', $jwt->encode());
+        $signature = $jwt->base64Decode($parts[2]);
+
+        $header->setAlgorithm(null);
+        $header = (object)$jwt->getHeader()->toArray();
+
+        $this->assertTrue($jwt->verify($key, $header, $claims, $signature));
+    }
+
+    /**
+     * Try the verify call on a JWT with no audience defined in the header
+     * @expectedException \Psecio\Jwt\Exception\DecodeException
+     */
+    public function testVerifyJwtSignatureNoAudience()
+    {
+        $key = 'test';
+        $header = new Header($key);
+        $jwt = new Jwt($header);
+        $jwt->issuer('http://example.org');
+
+        $claims = (object)$jwt->getClaims()->toArray();
+        $parts = explode('.', $jwt->encode());
+        $signature = $jwt->base64Decode($parts[2]);
+        $header = (object)$jwt->getHeader()->toArray();
+
+        $this->assertTrue($jwt->verify($key, $header, $claims, $signature));
+    }
+
+    /**
+     * Try the verify call on a JWT with no expiration defined in the header
+     * @expectedException \Psecio\Jwt\Exception\DecodeException
+     */
+    public function testVerifyJwtSignaturePastExpire()
+    {
+        $key = 'test';
+        $header = new Header($key);
+        $jwt = new Jwt($header);
+        $jwt->issuer('http://example.org')
+            ->audience('http://example.com')
+            ->expireTime(time()-3600);
+
+        $claims = (object)$jwt->getClaims()->toArray();
+        $parts = explode('.', $jwt->encode());
+        $signature = $jwt->base64Decode($parts[2]);
+        $header = (object)$jwt->getHeader()->toArray();
+
+        $this->assertTrue($jwt->verify($key, $header, $claims, $signature));
+    }
+
+    /**
+     * Try the verify call on a JWT with no expiration defined in the header
+     * @expectedException \Psecio\Jwt\Exception\DecodeException
+     */
+    public function testVerifyJwtSignatureNotProcessBefore()
+    {
+        $key = 'test';
+        $header = new Header($key);
+        $jwt = new Jwt($header);
+        $jwt->issuer('http://example.org')
+            ->audience('http://example.com')
+            ->expireTime(time()+3600)
+            ->notBefore(time()+3600);
+
+        $claims = (object)$jwt->getClaims()->toArray();
+        $parts = explode('.', $jwt->encode());
+        $signature = $jwt->base64Decode($parts[2]);
+        $header = (object)$jwt->getHeader()->toArray();
+
+        $this->assertTrue($jwt->verify($key, $header, $claims, $signature));
+    }
 }
