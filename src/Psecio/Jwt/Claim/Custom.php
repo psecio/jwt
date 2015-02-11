@@ -10,6 +10,7 @@ namespace Psecio\Jwt\Claim;
 class Custom extends \Psecio\Jwt\Claim
 {
 	protected $type;
+    protected $name = 'custom';
 
     /**
      * Initialize the claim with the given value and type

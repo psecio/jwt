@@ -10,4 +10,5 @@ namespace Psecio\Jwt\Claim;
 class Type extends \Psecio\Jwt\Claim
 {
 	protected $type = 'typ';
+    protected $name = 'type';
 }
