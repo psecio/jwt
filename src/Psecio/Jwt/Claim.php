@@ -17,6 +17,12 @@ abstract class Claim
 	protected $value;
 
 	/**
+	 * Claim "name" (ex. audience or issuer)
+	 * @var string
+	 */
+	protected $name;
+
+	/**
 	 * Initialize the claim with the given value
 	 *
 	 * @param string $value Claim value
@@ -78,5 +84,15 @@ abstract class Claim
 			'value' => $this->getValue(),
 			'type' => $this->getType()
 		);
+	}
+
+	/**
+	 * Get the name value for the current instance
+	 *
+	 * @return string Name value
+	 */
+	public function getName()
+	{
+		return $this->name;
 	}
 }
