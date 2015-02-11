@@ -2,7 +2,7 @@
 
 namespace Psecio\Jwt;
 
-require "ClaimStub.php";
+require_once "ClaimStub.php";
 
 class ClaimsCollectionTest extends \PHPUnit_Framework_TestCase
 {
