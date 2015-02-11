@@ -125,6 +125,33 @@ You can use any of the OpenSSL cypher methods provided by the [openssl_get_ciphe
 - Subject (sub)
 - Private
 
+### Hashing types
+
+By default this JWT tool uses `HMAC` hashing to generate the signature for the request. There are other options for this that will use the OpenSSL functionality to let you use public and private keys for these methods:
+
+- ES256
+- ES384
+- ES512
+- RS256
+- RS384
+- RS512
+
+You cannot use a simple text string for the key like you can with `HMAC` hashing, so you must provide a valid key instance for the library to use. Here's an example using a `.pem` private key file and the `RS256` hashing:
+
+```php
+<?php
+$key = openssl_pkey_get_private('file://'.__DIR__.'/private.pem', 'test1234');
+
+$header = new \Psecio\Jwt\Header($key);
+$header->setHashMethod('RS256');
+
+// or you can define the hash method on the init too:
+$header = new \Psecio\Jwt\Header($key, 'HS256', 'JWT', 'RS256');
+?>
+```
+
+An exception (`\Psecio\Jwt\Exception\InvalidKeyException`) will be thrown if the key is invalid and cannot be used in signing the request. If there is an error during the actual signing of the message, you will be thrown a `\Psecio\Jwt\Exception\SignatureErrorException`.
+
 ### Documentation for JSON Web Tokens
 
 - [Draft IETF](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html)
