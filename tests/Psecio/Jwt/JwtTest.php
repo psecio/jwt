@@ -360,4 +360,53 @@ class JwtTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($result->audience, 'http://example.com');
     }
+
+    /**
+     * Test getting the claim value with the magic method
+     */
+    public function testMagicGetClaimValue()
+    {
+        $audience = 'http://example.com';
+
+        $header = new \Psecio\Jwt\Header('test');
+        $jwt = new \Psecio\Jwt\Jwt($header);
+        $jwt->audience($audience);
+        $this->assertEquals($audience, $jwt->audience);
+        $this->assertEquals(null, $jwt->foo);
+    }
+
+    /**
+     * Test the setting of a claim with an invalid type
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetClaimInvalidType()
+    {
+        $header = new \Psecio\Jwt\Header('test');
+        $jwt = new \Psecio\Jwt\Jwt($header);
+        $jwt->foo('test');
+    }
+
+    /**
+     * Test the encryption and decryption of the token data
+     */
+    public function testEncryptDecryptToken()
+    {
+        $encryptKey = 'test1234';
+        $header = new Header('test');
+        $jwt = new Jwt($header);
+
+        $jwt
+            ->issuer('http://example.org')
+            ->audience('http://example.com')
+            ->issuedAt(1356999524)
+            ->notBefore(1357000000)
+            ->expireTime(time()+3600)
+            ->jwtId('id123456')
+            ->type('https://example.com/register')
+            ->custom('test', 'claim1');
+        $result = $jwt->encrypt('AES-256-CBC', '1234567812345678', $encryptKey);
+        $result = $jwt->decrypt($result, 'AES-256-CBC', '1234567812345678', $encryptKey);
+
+        $this->assertEquals($result->aud, 'http://example.com');
+    }
 }
