@@ -349,6 +349,22 @@ class Jwt
 	}
 
 	/**
+	 * See if a claim type matches the requested property
+	 *
+	 * @param  string $name Property name
+	 * @return mixed Either a null if not found or the matching data
+	 */
+	public function __get($name)
+	{
+		foreach ($this->getClaims() as $claim) {
+			if ($claim->getName() === $name) {
+				return $claim->getValue();
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Allow for the insertion of multiple custom values at once
 	 *
 	 * @param string|array $value Either a string for a single claim or array for multiple
