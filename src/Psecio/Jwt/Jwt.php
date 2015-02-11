@@ -309,7 +309,7 @@ class Jwt
 			$hash = new $hash();
 
 			if ($hash->isValidKey($key) === false) {
-				throw new \InvalidArgumentException('Invalid key provided');
+				throw new \Psecio\Jwt\Exception\InvalidKeyException('Invalid key provided');
 			}
 
 			$result = openssl_sign(
@@ -319,7 +319,7 @@ class Jwt
 				$hash->getAlgorithm()
 			);
 			if ($result === false) {
-				throw new \DomainException('Error signing with provided key');
+				throw new \Psecio\Jwt\Exception\SignatureErrorException('Error signing with provided key');
 			}
 		}
 		return $signature;
