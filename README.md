@@ -127,8 +127,11 @@ You can use any of the OpenSSL cypher methods provided by the [openssl_get_ciphe
 
 ### Hashing types
 
-By default this JWT tool uses `HMAC` hashing to generate the signature for the request. There are other options for this that will use the OpenSSL functionality to let you use public and private keys for these methods:
+By default this JWT tool uses `HMAC` hashing (HS256) to generate the signature for the request. There are other options for this that will use the OpenSSL functionality to let you use public and private keys for these methods:
 
+- HS256
+- HS384
+- HS512
 - ES256
 - ES384
 - ES512
