@@ -146,10 +146,10 @@ You cannot use a simple text string for the key like you can with `HMAC` hashing
 $key = openssl_pkey_get_private('file://'.__DIR__.'/private.pem', 'test1234');
 
 $header = new \Psecio\Jwt\Header($key);
-$header->setHashMethod('RS256');
+$header->setAlgorithm('RS256');
 
-// or you can define the hash method on the init too:
-$header = new \Psecio\Jwt\Header($key, 'HS256', 'JWT', 'RS256');
+// or you can define the hash algorithm on the init too:
+$header = new \Psecio\Jwt\Header($key, 'RS256');
 ?>
 ```
 
