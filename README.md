@@ -157,4 +157,6 @@ An exception (`\Psecio\Jwt\Exception\InvalidKeyException`) will be thrown if the
 
 ### Documentation for JSON Web Tokens
 
-- [Draft IETF](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html)
+- [JWT Draft IETF](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html)
+- [JWS Draft](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature)
+- [JWE Draft](https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption)
