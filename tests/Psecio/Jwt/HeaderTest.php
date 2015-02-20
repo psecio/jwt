@@ -103,16 +103,4 @@ class HeaderTest extends \PHPUnit_Framework_TestCase
 			)
 		);
 	}
-
-	/**
-	 * Test the getter/setter for hash method on the header
-	 */
-	public function testGetSetHashMethod()
-	{
-		$header = new Header('foo');
-		$this->assertEquals('HMAC', $header->getHashMethod());
-
-		$header->setHashMethod('RS256');
-		$this->assertEquals('RS256', $header->getHashMethod());
-	}
 }
