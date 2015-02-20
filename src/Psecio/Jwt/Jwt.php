@@ -94,18 +94,28 @@ class Jwt
 	 * @param string $claims Claims string to encode [optional]
 	 * @return string Encoded data, appended by periods
 	 */
-	public function encode($claims = null)
+	public function encode($claims = null, $addIssued = false)
 	{
 		$header = $this->getHeader();
+		$claimData = $this->getClaims()->toArray();
+
+		// If we don't have an "issued at" make one
+		if (!isset($claimData['iat']) && $addIssued === true) {
+			$claimData['iat'] = time();
+		}
+		ksort($claimData);
 
 		$claims = ($claims !== null)
 			? $claims
 			: $this->base64Encode(
-				json_encode($this->getClaims()->toArray(), JSON_UNESCAPED_SLASHES)
+				json_encode($claimData, JSON_UNESCAPED_SLASHES)
 			);
 
+		$headerData = $header->toArray();
+		ksort($headerData);
+
 		$sections = array(
-			$this->base64Encode(json_encode($header->toArray(), JSON_UNESCAPED_SLASHES)),
+			$this->base64Encode(json_encode($headerData, JSON_UNESCAPED_SLASHES)),
 			$claims
 		);
 
@@ -292,36 +302,37 @@ class Jwt
 	 */
 	public function sign($signWith, $key)
 	{
-		$hashType = $this->getHeader()->getHashMethod();
+		$hashType = $this->getHeader()->getAlgorithm();
 
-		if (strtolower($hashType) === 'hmac') {
+		$hash = '\\Psecio\\Jwt\\HashMethod\\'.$hashType;
+		if (class_exists($hash) === false) {
+			throw new \InvalidArgumentException('Invalid hash type: '.$hashType);
+		}
+		$hash = new $hash();
+
+		if ($hash->getKeyType() === 'HMAC') {
 			$signature = hash_hmac(
-				$this->getHeader()->getAlgorithm(true),
+				$hash->getAlgorithm(),
 				$signWith,
 				$key,
 				true
 			);
 		} else {
-			$hash = '\\Psecio\\Jwt\\HashMethod\\'.$hashType;
-			if (class_exists($hash) === false) {
-				throw new \InvalidArgumentException('Invalid hash type: '.$hashType);
-			}
-			$hash = new $hash();
-
 			if ($hash->isValidKey($key) === false) {
 				throw new \Psecio\Jwt\Exception\InvalidKeyException('Invalid key provided');
 			}
-
-			$result = openssl_sign(
+			openssl_sign(
 				$signWith,
 				$signature,
 				$key,
 				$hash->getAlgorithm()
 			);
-			if ($result === false) {
-				throw new \Psecio\Jwt\Exception\SignatureErrorException('Error signing with provided key');
-			}
 		}
+
+		if ($signature === false) {
+			throw new \Psecio\Jwt\Exception\SignatureErrorException('Error signing with provided key');
+		}
+
 		return $signature;
 	}
 
