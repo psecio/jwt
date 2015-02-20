@@ -110,8 +110,8 @@ class JwtTest extends \PHPUnit_Framework_TestCase
         $result = $jwt->encode();
         $parts = explode('.', $result);
 
-        $this->assertEquals($parts[0], 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9');
-        $this->assertTrue(strstr($parts[1], 'eyJpc3MiOiJodHRwOi8vZXhhbXBsZS5vcmciLCJhdWQiOiJodHRwOi8v') !== false);
+        $this->assertEquals($parts[0], 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9');
+        $this->assertTrue(strstr($parts[1], 'eyJhdWQiOiJodHRwOi8vZXhhbXBsZS5jb20iLCJjbGFpbTEi') !== false);
     }
 
     /**
@@ -190,10 +190,10 @@ class JwtTest extends \PHPUnit_Framework_TestCase
             ->issuer('http://example.org')
             ->audience('http://example.com');
 
-        $header = (object)$jwt->getHeader()->toArray();
-        $claims = (object)$jwt->getClaims()->toArray();
-        $parts = explode('.', $jwt->encode());
-        $signature = $jwt->base64Decode($parts[2]);
+        list($header, $claims, $signature) = explode('.', $jwt->encode());
+        $header = json_decode($jwt->base64Decode($header));
+        $claims = json_decode($jwt->base64Decode($claims));
+        $signature = $jwt->base64Decode($signature);
 
         $this->assertTrue($jwt->verify($key, $header, $claims, $signature));
     }
@@ -292,7 +292,7 @@ class JwtTest extends \PHPUnit_Framework_TestCase
         $keyPath = 'file://'.__DIR__.'/../../private.pem';
         $key = openssl_pkey_get_private($keyPath, 'test1234');
         $header = new \Psecio\Jwt\Header($key);
-        $header->setHashMethod('RS256');
+        $header->setAlgorithm('RS256');
 
         $jwt = new \Psecio\Jwt\Jwt($header);
         $jwt->audience('http://example.com');
@@ -312,7 +312,7 @@ class JwtTest extends \PHPUnit_Framework_TestCase
         $keyPath = 'file://'.__DIR__.'/../../private.pem';
         $key = openssl_pkey_get_private($keyPath, 'test1234');
         $header = new \Psecio\Jwt\Header($key);
-        $header->setHashMethod('RS1234');
+        $header->setAlgorithm('RS1234');
 
         $jwt = new \Psecio\Jwt\Jwt($header);
         $jwt->audience('http://example.com');
@@ -331,7 +331,7 @@ class JwtTest extends \PHPUnit_Framework_TestCase
     {
         $keyPath = 'file://'.__DIR__.'/../../private.pem';
         $header = new \Psecio\Jwt\Header('test');
-        $header->setHashMethod('RS256');
+        $header->setAlgorithm('RS256');
 
         $jwt = new \Psecio\Jwt\Jwt($header);
         $jwt->audience('http://example.com');
@@ -350,7 +350,7 @@ class JwtTest extends \PHPUnit_Framework_TestCase
     {
         $keyPath = 'file://'.__DIR__.'/../../private.pem';
         $header = new \Psecio\Jwt\Header('test');
-        $header->setHashMethod('RS256');
+        $header->setAlgorithm('RS256');
 
         $jwt = new \Psecio\Jwt\Jwt($header);
         $jwt->audience('http://example.com');
