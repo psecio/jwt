@@ -33,25 +33,22 @@ class Header
 	);
 
 	/**
-	 * Hashing method to use (defaults to "hmac")
-	 * @var string
-	 */
-	private $hashMethod = 'HMAC';
-
-	/**
 	 * Intitialize the Header
 	 *
 	 * @param string $key Key to use for encoding
 	 * @param string $algorithm Algorithm to use [optional]
 	 * @param string $type Type of object [optional]
-	 * @param string $hashMethod Hashing method to use [optional]
 	 */
-	public function __construct($key, $algorithm = 'HS256', $type = 'JWT', $hashMethod = 'HMAC')
+	public function __construct($key, $algorithm = 'HS256', $type = 'JWT')
 	{
 		$this->setType($type);
 		$this->setAlgorithm($algorithm);
 		$this->setKey($key);
-		$this->setHashMethod($hashMethod);
+
+		// If it's a certificate, we're a JWS instead
+		if (is_resource($key)) {
+			$this->setType('JWS');
+		}
 	}
 
 	/**
@@ -140,26 +137,6 @@ class Header
 	{
 		$data = $this->toArray();
 		return json_encode($data);
-	}
-
-	/**
-	 * Set the current hashing method
-	 *
-	 * @param string $method Hash method value
-	 */
-	public function setHashMethod($method)
-	{
-		$this->hashMethod = $method;
-	}
-
-	/**
-	 * Get the current hashing method
-	 *
-	 * @return string Hashing method
-	 */
-	public function getHashMethod()
-	{
-		return $this->hashMethod;
 	}
 
 	/**
