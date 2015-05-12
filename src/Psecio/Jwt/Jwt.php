@@ -308,7 +308,9 @@ class Jwt
 			4 - (strlen($data) % 4),
 			'='
 		);
-		return base64_decode(strtr($decoded, '-_', '+/'));
+
+		// use the strict parameter to fail if the JWT contains characters it shouldn't have
+		return base64_decode(strtr($decoded, '-_', '+/'), true);
 	}
 
 	/**
