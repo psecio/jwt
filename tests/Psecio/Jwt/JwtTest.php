@@ -223,7 +223,8 @@ class JwtTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Try the verify call on a JWT with no audience defined in the header
+     * Try the verify call on a JWT with no audience defined (defined but empty)
+     *     in the header
      * @expectedException \Psecio\Jwt\Exception\DecodeException
      */
     public function testVerifyJwtSignatureNoAudience()
@@ -232,6 +233,7 @@ class JwtTest extends \PHPUnit_Framework_TestCase
         $header = new Header($key);
         $jwt = new Jwt($header);
         $jwt->issuer('http://example.org');
+        $jwt->audience('');
 
         $claims = (object)$jwt->getClaims()->toArray();
         $parts = explode('.', $jwt->encode());

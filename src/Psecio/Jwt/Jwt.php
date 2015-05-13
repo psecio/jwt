@@ -238,8 +238,8 @@ class Jwt
 			throw new Exception\DecodeException('Invalid header: no algorithm specified');
 		}
 
-		if (!isset($claims->aud) || empty($claims->aud)) {
-			throw new Exception\DecodeException('Audience not defined [aud]');
+		if (isset($claims->aud) && empty($claims->aud)) {
+			throw new Exception\DecodeException('Audience cannot be empty [aud]');
 		}
 
 		// If "expires at" defined, check against time
