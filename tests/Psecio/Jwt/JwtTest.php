@@ -291,16 +291,25 @@ class JwtTest extends \PHPUnit_Framework_TestCase
      */
     public function testSignWithPrivateKeyValid()
     {
-        $keyPath = 'file://'.__DIR__.'/../../private.pem';
+        $keyPath = 'file://'.__DIR__.'/../../pair_private.pem';
         $key = openssl_pkey_get_private($keyPath, 'test1234');
         $header = new \Psecio\Jwt\Header($key);
         $header->setAlgorithm('RS256');
 
-        $jwt = new \Psecio\Jwt\Jwt($header);
-        $jwt->audience('http://example.com');
+        $jwtEncoder = new \Psecio\Jwt\Jwt($header);
+        $jwtEncoder->audience('http://example.com');
 
-        $result = $jwt->encode();
-        $result = $jwt->decode($result);
+        $result = $jwtEncoder->encode();
+
+        $keyPath = 'file://'.__DIR__.'/../../pair_public.pem';
+        $key = openssl_pkey_get_public($keyPath);
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setAlgorithm('RS256');
+
+        $jwtDecoder = new \Psecio\Jwt\Jwt($header);
+        $jwtDecoder->audience('http://example.com');
+
+        $result = $jwtDecoder->decode($result);
 
         $this->assertEquals($result->aud, 'http://example.com');
     }
