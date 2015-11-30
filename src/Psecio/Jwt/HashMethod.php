@@ -19,6 +19,11 @@ abstract class HashMethod
         return (isset($details['key'])) ? $this->getKeyType() === $details['type'] : false;
     }
 
+    public function isPrivateKey($key)
+    {
+        return @openssl_pkey_get_private($key) !== false;
+    }
+
     public function getKeyType()
     {
         return $this->keyType;
