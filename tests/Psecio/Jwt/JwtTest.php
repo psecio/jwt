@@ -291,7 +291,7 @@ class JwtTest extends \PHPUnit_Framework_TestCase
      */
     public function testSignWithPrivateKeyValid()
     {
-        $keyPath = 'file://'.__DIR__.'/../../pair_private.pem';
+        $keyPath = 'file://'.__DIR__.'/../../private.pem';
         $key = openssl_pkey_get_private($keyPath, 'test1234');
         $header = new \Psecio\Jwt\Header($key);
         $header->setAlgorithm('RS256');
