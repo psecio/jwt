@@ -277,7 +277,7 @@ class Jwt
 				$signature,
 				$key,
 				$hash->getAlgorithm()
-			);
+			) === 1;
 		}
 	}
 
