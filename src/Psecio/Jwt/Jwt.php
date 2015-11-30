@@ -254,14 +254,31 @@ class Jwt
 			);
 		}
 
-		$algorithm = $header->alg;
+		$hashType = $this->getHeader()->getAlgorithm();
+		$hash = '\\Psecio\\Jwt\\HashMethod\\'.$hashType;
+		if (class_exists($hash) === false) {
+			throw new \InvalidArgumentException('Invalid hash type: '.$hashType);
+		}
+		/** @var  HashMethod $hash */
+		$hash = new $hash();
+
 		$signWith = implode('.', array(
 			$this->base64Encode(json_encode($header, JSON_UNESCAPED_SLASHES)),
 			$this->base64Encode(json_encode($claims, JSON_UNESCAPED_SLASHES))
 		));
-		return (
-			$this->hash_equals($this->sign($signWith, $key, $algorithm), $signature)
-		);
+		if ($hash->getKeyType() === 'HMAC' || $hash->isPrivateKey($key)) {
+			return $this->hash_equals($this->sign($signWith, $key), $signature);
+		} else {
+			if ($hash->isValidKey($key) === false) {
+				throw new \Psecio\Jwt\Exception\InvalidKeyException('Invalid key provided');
+			}
+			return openssl_verify(
+				$signWith,
+				$signature,
+				$key,
+				$hash->getAlgorithm()
+			) === 1;
+		}
 	}
 
 	/**
@@ -308,6 +325,7 @@ class Jwt
 		if (class_exists($hash) === false) {
 			throw new \InvalidArgumentException('Invalid hash type: '.$hashType);
 		}
+		/** @var  HashMethod $hash */
 		$hash = new $hash();
 
 		if ($hash->getKeyType() === 'HMAC') {

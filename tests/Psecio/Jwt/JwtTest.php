@@ -298,9 +298,92 @@ class JwtTest extends \PHPUnit_Framework_TestCase
 
         $jwt = new \Psecio\Jwt\Jwt($header);
         $jwt->audience('http://example.com');
-
         $result = $jwt->encode();
         $result = $jwt->decode($result);
+
+        $this->assertEquals($result->aud, 'http://example.com');
+    }
+
+    /**
+     * Test the signing with private key data (verify decode)
+     */
+    public function testSignWithPrivateAndPublicKeyValid()
+    {
+        $keyPath = 'file://'.__DIR__.'/../../pair_private.pem';
+        $key = openssl_pkey_get_private($keyPath, 'test1234');
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setAlgorithm('RS256');
+
+        $jwtEncoder = new \Psecio\Jwt\Jwt($header);
+        $jwtEncoder->audience('http://example.com');
+
+        $result = $jwtEncoder->encode();
+
+        $keyPath = 'file://'.__DIR__.'/../../pair_public.pem';
+        $key = openssl_pkey_get_public($keyPath);
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setAlgorithm('RS256');
+
+        $jwtDecoder = new \Psecio\Jwt\Jwt($header);
+        $jwtDecoder->audience('http://example.com');
+
+        $result = $jwtDecoder->decode($result);
+
+        $this->assertEquals($result->aud, 'http://example.com');
+    }
+
+    /**
+     * Test signature verification failure when using unmatched public key
+     * @expectedException \Psecio\Jwt\Exception\BadSignatureException
+     */
+    public function testSignWithUnmatchedPrivateAndPublicKeyValid()
+    {
+        $keyPath = 'file://'.__DIR__.'/../../private.pem';
+        $key = openssl_pkey_get_private($keyPath, 'test1234');
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setAlgorithm('RS256');
+
+        $jwtEncoder = new \Psecio\Jwt\Jwt($header);
+        $jwtEncoder->audience('http://example.com');
+
+        $result = $jwtEncoder->encode();
+
+        $keyPath = 'file://'.__DIR__.'/../../pair_public.pem';
+        $key = openssl_pkey_get_public($keyPath);
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setAlgorithm('RS256');
+
+        $jwtDecoder = new \Psecio\Jwt\Jwt($header);
+        $jwtDecoder->audience('http://example.com');
+
+        $result = $jwtDecoder->decode($result);
+
+        $this->assertEquals($result->aud, 'http://example.com');
+    }
+
+    /**
+     * Test the signing with public key as attack-vector
+     * @expectedException \Psecio\Jwt\Exception\BadSignatureException
+     */
+    public function testAttackSignedWithPublicKeyFailsToVerify()
+    {
+        $key = file_get_contents('file://'.__DIR__.'/../../pair_public.pem');
+        $header = new \Psecio\Jwt\Header($key);
+
+        $jwtEncoder = new \Psecio\Jwt\Jwt($header);
+        $jwtEncoder->audience('http://example.com');
+
+        $result = $jwtEncoder->encode();
+
+        $keyPath = 'file://'.__DIR__.'/../../pair_public.pem';
+        $key = openssl_pkey_get_public($keyPath);
+        $header = new \Psecio\Jwt\Header($key);
+        $header->setAlgorithm('RS256');
+
+        $jwtDecoder = new \Psecio\Jwt\Jwt($header);
+        $jwtDecoder->audience('http://example.com');
+
+        $result = $jwtDecoder->decode($result);
 
         $this->assertEquals($result->aud, 'http://example.com');
     }
